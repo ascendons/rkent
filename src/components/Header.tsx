@@ -1,173 +1,121 @@
-import { useState } from "react";
-import { Menu, X, ChevronDown } from "lucide-react"; // Added ChevronDown
-import logo from "/logo.png";
+"use client";
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"; // Changed to DropdownMenu
+import Image from "next/image";
+import { useEffect, useState } from "react";
+import { site, tel } from "@/lib/site";
 
-const Header = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+const links = [
+  { href: "#range", label: "Range" },
+  { href: "#catalogue", label: "Catalogue" },
+  { href: "#why", label: "Why RK" },
+  { href: "#contact", label: "Contact" },
+];
 
-  const scrollToSection = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-      setIsMenuOpen(false);
-    }
-  };
+export function Logo({ light = false }: { light?: boolean }) {
+  return (
+    <span className="flex items-center gap-3">
+      <span className="flex h-10 w-10 items-center justify-center rounded-md bg-navy ring-1 ring-white/10">
+        <Image src={`${site.basePath}/mark.png`} alt="" width={519} height={221} priority className="w-7" />
+      </span>
+      <span className="leading-none">
+        <span
+          className={`block text-[17px] font-semibold tracking-tight [font-stretch:112%] ${light ? "text-white" : "text-navy"}`}
+        >
+          RK Enterprises
+        </span>
+        <span
+          className={`mt-1 block font-mono text-[10px] tracking-[0.18em] uppercase ${light ? "text-white/50" : "text-mute"}`}
+        >
+          Jamshedpur
+        </span>
+      </span>
+    </span>
+  );
+}
+
+export default function Header() {
+  const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    document.body.style.overflow = open ? "hidden" : "";
+  }, [open]);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
-      <div className="container mx-auto px-4">
-        <div className="flex h-16 items-center justify-between">
-          {/* ✅ Logo + Company Name */}
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => scrollToSection("home")}
-              className="flex items-center gap-2 text-xl font-bold text-primary hover:text-accent transition-colors"
-            >
-              <img
-                src={logo}
-                alt="RK Enterprises Logo"
-                className="w-10 h-10 rounded-md"
-              />
-              <span>RK Enterprises</span>
-            </button>
-          </div>
+    <>
+      <header
+        className={`fixed inset-x-0 top-0 z-50 backdrop-blur-md transition-[background-color,border-color] duration-300 ${
+          open ? "bg-paper" : scrolled ? "bg-paper/85" : "bg-paper/0"
+        } border-b ${scrolled || open ? "border-rule" : "border-transparent"}`}
+      >
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:h-[72px]">
+          <a href="#top" aria-label={`${site.name} home`} onClick={() => setOpen(false)}>
+            <Logo />
+          </a>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-6">
-            {/* 🧭 All buttons updated for no blue focus */}
-            <button
-              onClick={() => scrollToSection("home")}
-              className="text-sm font-medium text-foreground hover:text-primary transition-colors focus:outline-none focus:ring-0 active:outline-none"
+          <nav className="hidden items-center gap-9 md:flex" aria-label="Main">
+            {links.map((l) => (
+              <a key={l.href} href={l.href} className="draw-line pb-0.5 text-[15px] text-navy/75 transition-colors hover:text-navy">
+                {l.label}
+              </a>
+            ))}
+            <a
+              href={tel}
+              className="rounded-full bg-navy px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-navy-2"
             >
-              Home
-            </button>
-            <button
-              onClick={() => scrollToSection("about")}
-              className="text-sm font-medium text-foreground hover:text-primary transition-colors focus:outline-none focus:ring-0 active:outline-none"
-            >
-              About Us
-            </button>
-
-            {/* --- Products Dropdown (Changed to Click) --- */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-1 text-sm font-medium text-foreground hover:text-primary transition-colors focus:outline-none focus:ring-0 active:outline-none">
-                  Products
-                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-[400px] bg-card p-2">
-                {[
-                  { title: "ZOLOTO" },
-                  { title: "Leader" },
-                  { title: "Industrial Hardware" },
-                ].map((item) => (
-                  <DropdownMenuItem key={item.title} asChild>
-                    <button
-                      onClick={() => scrollToSection("products")}
-                      className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none 
-                                 transition-colors 
-                                 hover:bg-accent hover:text-accent-foreground
-                                 focus:bg-accent focus:text-accent-foreground
-                                 focus:outline-none focus:ring-0 active:outline-none w-full text-left shadow-none"
-                    >
-                      <div className="text-sm font-medium leading-none">
-                        {item.title}
-                      </div>
-                      <p className="line-clamp-2 text-sm leading-snug text-muted-foreground"></p>
-                    </button>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-            {/* --- End Dropdown --- */}
-
-            <button
-              onClick={() => scrollToSection("services")}
-              className="text-sm font-medium text-foreground hover:text-primary transition-colors focus:outline-none focus:ring-0 active:outline-none"
-            >
-              Services
-            </button>
-            <button
-              onClick={() => scrollToSection("contact")}
-              className="text-sm font-medium text-foreground hover:text-primary transition-colors focus:outline-none focus:ring-0 active:outline-none"
-            >
-              Contact Us
-            </button>
+              {site.phoneDisplay}
+            </a>
           </nav>
 
-          {/* Mobile Menu Button */}
           <button
-            className="md:hidden"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            aria-label="Toggle menu"
+            type="button"
+            className="relative -mr-2 flex h-11 w-11 items-center justify-center md:hidden"
+            aria-label={open ? "Close menu" : "Open menu"}
+            aria-expanded={open}
+            aria-controls="mobile-nav"
+            onClick={() => setOpen((v) => !v)}
           >
-            {isMenuOpen ? (
-              <X className="h-6 w-6 text-foreground" />
-            ) : (
-              <Menu className="h-6 w-6 text-foreground" />
-            )}
+            <span
+              className={`absolute h-[1.5px] w-6 bg-navy transition-transform duration-300 ${open ? "rotate-45" : "-translate-y-[5px]"}`}
+            />
+            <span
+              className={`absolute h-[1.5px] w-6 bg-navy transition-transform duration-300 ${open ? "-rotate-45" : "translate-y-[5px]"}`}
+            />
           </button>
         </div>
+      </header>
 
-        {/* Mobile Navigation */}
-        {isMenuOpen && (
-          <div className="md:hidden py-4 space-y-2 border-t">
-            <button
-              onClick={() => scrollToSection("home")}
-              className="block w-full text-left px-4 py-2 text-sm font-medium text-foreground hover:bg-muted rounded-md focus:outline-none focus:ring-0 active:outline-none"
-            >
-              Home
-            </button>
-            <button
-              onClick={() => scrollToSection("about")}
-              className="block w-full text-left px-4 py-2 text-sm font-medium text-foreground hover:bg-muted rounded-md focus:outline-none focus:ring-0 active:outline-none"
-            >
-              About Us
-            </button>
-
-            <div className="px-4 py-2">
-              <div className="text-sm font-medium text-muted-foreground mb-2">
-                Products
-              </div>
-              {["ZOLOTO", "Leader", "Industrial Hardware"].map(
-                (item) => (
-                  <button
-                    key={item}
-                    onClick={() => scrollToSection("products")}
-                    className="block w-full text-left pl-4 py-1 text-sm text-foreground hover:text-primary focus:outline-none focus:ring-0 active:outline-none"
-                  >
-                    {item}
-                  </button>
-                )
-              )}
-            </div>
-
-            <button
-              onClick={() => scrollToSection("services")}
-              className="block w-full text-left px-4 py-2 text-sm font-medium text-foreground hover:bg-muted rounded-md focus:outline-none focus:ring-0 active:outline-none"
-            >
-              Services
-            </button>
-            <button
-              onClick={() => scrollToSection("contact")}
-              className="block w-full text-left px-4 py-2 text-sm font-medium text-foreground hover:bg-muted rounded-md focus:outline-none focus:ring-0 active:outline-none"
-            >
-              Contact Us
-            </button>
-          </div>
-        )}
-      </div>
-    </header>
+      {/* Kept outside <header>: its backdrop-filter would otherwise become the
+          containing block for this fixed panel and collapse it to header height. */}
+      <nav
+        id="mobile-nav"
+        aria-label="Mobile"
+        className={`drafting fixed inset-x-0 top-16 bottom-0 z-40 flex flex-col bg-paper px-6 pt-4 pb-28 transition-[opacity,visibility] duration-300 md:hidden ${
+          open ? "visible opacity-100" : "invisible opacity-0"
+        }`}
+      >
+        {links.map((l, i) => (
+          <a
+            key={l.href}
+            href={l.href}
+            onClick={() => setOpen(false)}
+            className="flex items-baseline justify-between border-b border-rule py-5 text-3xl font-medium tracking-tight [font-stretch:110%]"
+          >
+            {l.label}
+            <span className="font-mono text-xs text-mute">0{i + 1}</span>
+          </a>
+        ))}
+        <p className="mt-auto font-mono text-xs tracking-wider text-mute uppercase">
+          {site.address.line2} · {site.phoneDisplay}
+        </p>
+      </nav>
+    </>
   );
-};
-
-export default Header;
-
+}

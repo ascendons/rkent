@@ -1,142 +1,115 @@
-import { useState, useEffect, useRef } from 'react';
-import { Button } from "@/components/ui/button";
+import { site } from "@/lib/site";
+import ValveDrawing from "./ValveDrawing";
 
-// --- ADD YOUR IMAGE IMPORTS HERE ---
-// UNCOMMENT THESE LINES:
-import myImage1 from '@/assets/hero-bg.jpg';
-import myImage2 from '@/assets/360_F_487195094_Nk7bDMyl2BcNhXoPpbheXKpWoaOz2yUt.jpg';
-import myImage3 from '@/assets/im.jpg';
-// --- Carousel Images (FIXED) ---
-// ...
-// ...
-const carouselImages = [
-  { src: myImage1, alt: "Industrial hardware" },
-  { src: myImage2, alt: "Construction tools" },  
-  { src: myImage3, alt: "Metal pipe fittings" }, 
+const titleBlock = [
+  ["Art. No.", "1036"],
+  ["Make", "Zoloto"],
+  ["Ends", "Flanged"],
+  ["HSN", "84818030"],
 ];
-// --- --- --- --- --- --- --- --- ---
-// --- --- --- --- --- --- --- --- ---
 
-const Hero = () => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const timeoutRef = useRef<number | null>(null);
-
-  // Function to reset the autoplay timer
-  const resetTimeout = () => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-    // Change image every 5 seconds
-    timeoutRef.current = window.setTimeout(
-      () =>
-        setCurrentIndex((prevIndex) =>
-          prevIndex === carouselImages.length - 1 ? 0 : prevIndex + 1
-        ),
-      5000 
-    );
-  };
-
-  // Start the autoplay timer on mount and reset on index change
-  useEffect(() => {
-    resetTimeout();
-    // Clear timeout on component unmount
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, [currentIndex]);
-
-  // Go to a specific slide
-  const goToSlide = (slideIndex: number) => {
-    setCurrentIndex(slideIndex);
-  };
-
-  const scrollToSection = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-    }
-  };
+export default function Hero({ count, families }: { count: number; families: number }) {
+  const stats = [
+    [count ? String(count) : "100+", "catalogue items"],
+    [families ? String(families) : "10+", "valve families"],
+    ["6", "days a week"],
+  ];
 
   return (
-    <section id="home" className="relative min-h-[600px] flex items-center justify-center overflow-hidden">
-      {/* --- Carousel Background --- */}
-      <div className="absolute inset-0 z-0">
-        {carouselImages.map((image, index) => (
-          <img
-            key={index}
-            src={image.src}
-            alt={image.alt}
-            className={`w-full h-full object-cover absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-              index === currentIndex ? "opacity-100" : "opacity-0"
-            }`}
-            // Handle image load error
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.src = `https://placehold.co/1920x1080/111827/4b5563?text=Image+Not+Found`;
-              target.alt = "Image not found";
-            }}
-          />
-        ))}
-        {/* Background Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/90 to-primary/70" />
-      </div>
-
-      {/* --- Carousel Dots --- */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex gap-2">
-        {carouselImages.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => goToSlide(index)}
-            aria-label={`Go to slide ${index + 1}`}
-            className={`w-3 h-3 rounded-full transition-all ${
-              index === currentIndex ? "bg-white scale-125" : "bg-white/50 hover:bg-white/75"
-            }`}
-          />
-        ))}
-      </div>
-
-      {/* --- Content --- */}
-      <div className="container mx-auto px-4 relative z-10 py-20">
-        <div className="max-w-3xl">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-primary-foreground mb-6 leading-tight">
-            RK Enterprises
+    <section id="top" className="drafting relative overflow-hidden pt-28 pb-20 sm:pt-32 lg:pt-40 lg:pb-28">
+      <div className="mx-auto grid max-w-7xl gap-14 px-4 sm:px-6 lg:grid-cols-[1.1fr_1fr] lg:items-center lg:gap-12">
+        <div>
+          <p data-reveal className="mb-6 font-mono text-xs tracking-[0.2em] text-brass-deep uppercase">
+            Valves · Pipes &amp; Fittings · Hardware
+          </p>
+          <h1
+            data-reveal
+            style={{ ["--d" as string]: "80ms" }}
+            className="text-[clamp(2.5rem,6.2vw,4.75rem)] leading-[0.98] font-semibold tracking-[-0.03em] [font-stretch:108%]"
+          >
+            Every line needs
+            <br />
+            the <span className="text-green">right valve.</span>
           </h1>
-          <p className="text-xl md:text-2xl text-primary-foreground/90 mb-8 leading-relaxed">
-            Reliable Hardware Solutions for Every Industry
+          <p
+            data-reveal
+            style={{ ["--d" as string]: "160ms" }}
+            className="mt-7 max-w-xl text-lg leading-relaxed text-mute"
+          >
+            {site.name} supplies Zoloto and Leader valves, pipes and fittings, and everyday industrial hardware to
+            plants, contractors and maintenance teams across Jamshedpur. Look up an Art. No., pull its data sheet, and
+            send us your list.
           </p>
-          <p className="text-lg text-primary-foreground/80 mb-10 max-w-2xl">
-            Your trusted partner for quality industrial hardware, pipes, fittings, and valves. 
-            Delivering excellence in every product, every time.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4">
-            <Button
-              size="lg"
-              variant="secondary"
-              onClick={() => scrollToSection("products")}
-              className="text-base"
+          <div data-reveal style={{ ["--d" as string]: "240ms" }} className="mt-10 flex flex-col gap-3 sm:flex-row">
+            <a
+              href="#catalogue"
+              className="group inline-flex items-center justify-center gap-3 rounded-full bg-navy px-7 py-4 font-medium text-white transition-colors hover:bg-navy-2"
             >
-              View Products
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              onClick={() => scrollToSection("contact")}
-              className="text-base bg-transparent border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary"
+              Browse the catalogue
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                aria-hidden
+                className="transition-transform duration-300 group-hover:translate-x-1"
+              >
+                <path d="M5 12h14M13 6l6 6-6 6" />
+              </svg>
+            </a>
+            <a
+              href="#contact"
+              className="inline-flex items-center justify-center rounded-full border border-navy/20 px-7 py-4 font-medium transition-colors hover:border-navy/50 hover:bg-white/60"
             >
-              Contact Us
-            </Button>
+              Send an enquiry
+            </a>
           </div>
+
+          <dl
+            data-reveal
+            style={{ ["--d" as string]: "320ms" }}
+            className="mt-14 grid max-w-lg grid-cols-3 border-t border-rule pt-6"
+          >
+            {stats.map(([n, l]) => (
+              <div key={l}>
+                <dt className="sr-only">{l}</dt>
+                <dd className="text-3xl font-semibold tracking-tight [font-stretch:108%]">{n}</dd>
+                <dd className="mt-1 text-sm text-mute">{l}</dd>
+              </div>
+            ))}
+          </dl>
         </div>
+
+        {/* Drawing sheet */}
+        <figure
+          data-reveal
+          style={{ ["--d" as string]: "200ms" }}
+          className="relative rounded-xl border border-rule bg-white/70 shadow-[0_1px_0_rgb(22_28_60/0.04),0_30px_60px_-30px_rgb(22_28_60/0.25)] backdrop-blur-sm"
+        >
+          <div className="flex items-center justify-between border-b border-rule px-5 py-3 font-mono text-[11px] tracking-[0.14em] text-mute uppercase">
+            <span>Gate valve · Bronze</span>
+            <span>Sheet 01</span>
+          </div>
+          <div className="px-4 pt-5 pb-2 sm:px-8">
+            <ValveDrawing />
+          </div>
+          <figcaption className="grid grid-cols-2 border-t border-rule sm:grid-cols-4">
+            {titleBlock.map(([k, v], i) => (
+              <div
+                key={k}
+                className={`px-5 py-3 ${i % 2 ? "border-l" : ""} ${i > 1 ? "border-t sm:border-t-0" : ""} ${
+                  i === 2 ? "sm:border-l" : ""
+                } border-rule`}
+              >
+                <p className="font-mono text-[10px] tracking-[0.16em] text-mute uppercase">{k}</p>
+                <p className="mt-1 font-mono text-sm text-navy">{v}</p>
+              </div>
+            ))}
+          </figcaption>
+        </figure>
       </div>
     </section>
   );
-};
-
-export default Hero;
-
-
-
-
-
+}
