@@ -89,10 +89,13 @@ function getSheet() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   let sheet = ss.getSheetByName(SHEET);
   if (!sheet) sheet = ss.insertSheet(SHEET);
-  if (sheet.getLastRow() === 0) {
-    sheet.appendRow(COLUMNS.map((c) => c[0]));
+  // Add any of our columns missing from row 1, so rows never land under headers we don't recognise.
+  const last = sheet.getLastColumn();
+  const headers = last ? sheet.getRange(1, 1, 1, last).getValues()[0].filter(String) : [];
+  const missing = COLUMNS.map((c) => c[0]).filter((h) => !headers.includes(h));
+  if (missing.length) {
+    sheet.getRange(1, headers.length ? last + 1 : 1, 1, missing.length).setValues([missing]).setFontWeight("bold");
     sheet.setFrozenRows(1);
-    sheet.getRange(1, 1, 1, COLUMNS.length).setFontWeight("bold");
   }
   return sheet;
 }
