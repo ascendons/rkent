@@ -17,4 +17,8 @@ npm run build   # static site in ./out
   Columns: `Company, Art. No., Product Description, Connection Type, HSN Code, TDR Link`.
   A snapshot is baked in at build time and the page refreshes it from the sheet on load,
   so sheet edits appear without a redeploy.
-- **Enquiries**: posted to the Google Form in `enquiryForm`; responses land in that form's sheet.
+- **Enquiries**: saved to a Google Sheet by the Apps Script in `scripts/enquiries.gs` (setup steps at the
+  top of that file). Each row has the enquiry, a Status/Notes column for follow-up, and tracking info:
+  UTM source/medium/campaign, Google/Facebook click IDs, referrer, landing page, first-visit date, device.
+  Paste the web app URL into `enquirySheet.endpoint` in `src/lib/site.ts`; while it's empty, enquiries
+  go to the Google Form in `enquiryForm` instead.

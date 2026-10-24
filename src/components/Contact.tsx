@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { enquiry, useEnquiry } from "@/lib/enquiry";
-import { enquiryForm, mailto, mapQuery, site, tel } from "@/lib/site";
+import { enquiryForm, enquirySheet, mailto, mapQuery, site, tel } from "@/lib/site";
+import { captureVisit, trackingInfo } from "@/lib/tracking";
 
 const field =
   "w-full rounded-lg border border-rule bg-white px-4 py-3 text-base text-navy placeholder:text-mute/60 transition-colors focus:border-navy focus:outline-none";
@@ -15,20 +16,32 @@ export default function Contact() {
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }));
 
+  useEffect(captureVisit, []);
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setState("sending");
     const list = picked.map((p) => `• ${p.artNo} ${p.name}${p.connection ? ` (${p.connection})` : ""}`);
     const message = [list.length && `Items:\n${list.join("\n")}`, form.message].filter(Boolean).join("\n\n");
-    const body = new URLSearchParams({
-      [enquiryForm.fields.name]: form.name,
-      [enquiryForm.fields.email]: form.email,
-      [enquiryForm.fields.phone]: form.phone,
-      [enquiryForm.fields.message]: message || "(no message)",
-    });
+    const body = enquirySheet.endpoint
+      ? new URLSearchParams({
+          name: form.name,
+          email: form.email,
+          phone: form.phone,
+          items: picked.map((p) => p.artNo).join(", "),
+          message: message || "(no message)",
+          website: String(new FormData(e.currentTarget as HTMLFormElement).get("website") ?? ""),
+          ...trackingInfo(),
+        })
+      : new URLSearchParams({
+          [enquiryForm.fields.name]: form.name,
+          [enquiryForm.fields.email]: form.email,
+          [enquiryForm.fields.phone]: form.phone,
+          [enquiryForm.fields.message]: message || "(no message)",
+        });
     try {
-      // Google Forms doesn't send CORS headers; an opaque response still means it was accepted.
-      await fetch(enquiryForm.action, { method: "POST", body, mode: "no-cors" });
+      // Neither Apps Script nor Google Forms sends CORS headers; an opaque response still means it was accepted.
+      await fetch(enquirySheet.endpoint || enquiryForm.action, { method: "POST", body, mode: "no-cors" });
       setState("sent");
       setForm({ name: "", phone: "", email: "", message: "" });
       enquiry.clear();
@@ -127,6 +140,8 @@ export default function Contact() {
           ) : (
             <form onSubmit={submit} className="rounded-2xl border border-rule bg-white p-6 sm:p-10">
               <h3 className="text-2xl font-semibold tracking-tight [font-stretch:108%]">Enquiry</h3>
+              {/* Spam trap: hidden from people, filled in by bots. */}
+              <input name="website" tabIndex={-1} autoComplete="off" aria-hidden className="hidden" />
 
               {picked.length > 0 && (
                 <div className="mt-6 rounded-xl bg-paper p-4">

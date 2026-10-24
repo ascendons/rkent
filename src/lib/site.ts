@@ -28,7 +28,14 @@ export const tel = `tel:+91${site.phone}`;
 export const mailto = `mailto:${site.email}`;
 export const mapQuery = "Naya Bazar, Jugsalai, Jamshedpur, Jharkhand 831006";
 
-// Google Form that receives website enquiries.
+// Google Sheet that stores every enquiry with tracking info (see scripts/enquiries.gs).
+// Paste the Apps Script web app URL here; while it's empty, enquiries go to the Google Form below.
+export const enquirySheet = {
+  endpoint:
+    "https://script.google.com/macros/s/AKfycbz81ZT1HEWK4HL8RZ3ph3FSjTSe5Mz2UFIbrkJgE9r9Z8QLR_J4gNa-lFBou18zJAc42w/exec",
+};
+
+// Google Form that receives website enquiries (fallback when enquirySheet.endpoint is empty).
 export const enquiryForm = {
   action:
     "https://docs.google.com/forms/d/e/1FAIpQLSeSWa8EMf5zl7vGddTb-mt7T1gssCJ6r9Qah7t0ZtbFvYIuhA/formResponse",
